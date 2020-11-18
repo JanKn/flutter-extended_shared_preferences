@@ -16,19 +16,20 @@ public class SwiftSharedpreferencesPlugin: NSObject, FlutterPlugin {
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let method = call.method
         
-        guard let arguments = call.arguments as? Dictionary<String, Any>,
-            let filename = arguments["filename"] as? String,
-            let defaults = UserDefaults(suiteName: filename)
-            else {
+        guard let arguments = call.arguments as? Dictionary<String, Any>
+              else {
                 result(FlutterError())
                 return
         }
-                   
+        let defaults = UserDefaults.standard
+      
 
         switch method {
             
         case "getAll":
-            guard let dicitionary = defaults.persistentDomain(forName: filename) else { return }
+            let dicitionary = defaults.dictionaryRepresentation().filter {
+                $0.value is NSString || $0.value is NSNumber
+            }
             result(dicitionary)
             
         case "setBool":
@@ -56,7 +57,7 @@ public class SwiftSharedpreferencesPlugin: NSObject, FlutterPlugin {
             result(true)
             
         case "clear":
-            defaults.removePersistentDomain(forName: filename)
+            //defaults.removePersistentDomain(forName: filename)
             result(true)
             
         default:
